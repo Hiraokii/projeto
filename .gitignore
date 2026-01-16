@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+#ignorar p8
+*.p8
+ios/fastlane/AuthKey_*.p8
 # Symbolication related
 app.*.symbols
 
