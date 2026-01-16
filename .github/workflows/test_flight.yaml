@@ -37,7 +37,7 @@ jobs:
 
       - name: Run fastlane beta
         env:
-          MATCH_PASSWORD: ""
+          MATCH_PASSWORD: " "
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_BASE64: ${{secrets.ASC_KEY_BASE64}}
