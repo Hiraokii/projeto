@@ -40,7 +40,7 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_BASE64: ${{secrets.ASC_KEY_BASE64}}
-          ASC_KEY_FILEPATH: ios/fastlane/AuthKey.p8
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{secrets.MATCH_GIT_BASIC_AUTHORIZATION}}
         run: |
           cd ios
           bundle exec fastlane teste
