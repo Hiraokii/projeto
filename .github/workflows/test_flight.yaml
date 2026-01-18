@@ -1,4 +1,4 @@
-name: iOS Build and Upload to TestFlight
+name: iOS CI
 
 on:
   push:
@@ -16,12 +16,16 @@ jobs:
 
       - name: Setup Ruby 3.2.2
         uses: ruby/setup-ruby@v1
-        
         with:
-          ruby-version: '3.2.2'
-          
-          
+          ruby-version: "3.2.2"
+          bundler-cache: true
+
+      # Se seu Gemfile estiver em ios/Gemfile, este bundler-cache já ajuda.
+      # Se não estiver, o bundle install abaixo também resolve.
+
       - name: Create and unlock CI keychain
+        working-directory: ios
+        shell: bash
         env:
           KEYCHAIN_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
@@ -38,26 +42,49 @@ jobs:
           security default-keychain -d user -s "$KEYCHAIN_NAME"
 
           echo "Default keychain:"
-          security default-keychain -d 
-          working-directory: ios
-          
+          security default-keychain
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-        with: 
-          flutter-version: '3.38.1'
-          channel: 'stable'
+        with:
+          flutter-version: "3.38.1"
+          channel: "stable"
+          cache: true
 
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Run fastlane teste
+      - name: Install gems (iOS)
+        working-directory: ios
+        run: |
+          bundle install
+
+      # Opcional mas altamente recomendado: roda o match explicitamente no workflow
+      # para garantir que o keychain_name/password do CI sejam usados, independentemente do seu Fastfile.
+      - name: Fastlane match (App Store)
+        working-directory: ios
         env:
-          MATCH_PASSWORD: ${{secrets.MATCH_PASSWORD}}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+        run: |
+          bundle exec fastlane match appstore \
+            keychain_name:ci.keychain-db \
+            keychain_password:"$KEYCHAIN_PASSWORD"
+
+      - name: Verify code signing identities
+        run: security find-identity -v -p codesigning
+
+      - name: Run fastlane teste
+        working-directory: ios
+        env:
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_BASE64: ${{secrets.ASC_KEY_BASE64}}
-          MATCH_GIT_URL: ${{secrets.MATCH_GIT_URL}}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{secrets.MATCH_GIT_BASIC_AUTHORIZATION}}
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: |
-          cd ios
           bundle exec fastlane teste
