@@ -70,6 +70,7 @@ jobs:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
         run: |
           bundle exec fastlane match appstore \
+           readonly: true \
             keychain_name:ci.keychain-db \
             keychain_password:"$KEYCHAIN_PASSWORD"
 
