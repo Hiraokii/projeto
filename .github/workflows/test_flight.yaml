@@ -38,7 +38,7 @@ jobs:
           security default-keychain -d user -s "$KEYCHAIN_NAME"
 
           echo "Default keychain:"
-          security default-keychain -d user-cache: true
+          security default-keychain -d 
           working-directory: ios
           
       - name: Setup Flutter
