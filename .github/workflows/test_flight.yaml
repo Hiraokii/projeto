@@ -33,9 +33,7 @@ jobs:
       - name: Install gems (iOS)
         working-directory: ios
         run: bundle install
-        
-       - name: Prebuild App no code sign
-
+      
         
       - name: Run fastlane teste
         working-directory: ios
