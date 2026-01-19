@@ -8,6 +8,7 @@ type("appstore") # The default type, can be: appstore, adhoc, enterprise or deve
  username("flatcable@gmail.com") # Your Apple Developer Portal username
 
  team_id("XRWFA24NPG")
+ force_for_new_devices(true)
 
 
 # For all available options run `fastlane match --help`

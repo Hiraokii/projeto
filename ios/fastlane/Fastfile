@@ -1,25 +1,31 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
+# fastlane/Fastfile
 
 default_platform(:ios)
 
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
+    # Se você for usar essa lane no CI algum dia, ela precisa de match também.
+    is_ci = ENV["CI"] == "true"
+
+    match(
+      type: "appstore",
+      readonly: is_ci,
+      keychain_name: "ci.keychain-db",
+      keychain_password: ENV["KEYCHAIN_PASSWORD"]
+    )
+
     increment_build_number(xcodeproj: "Runner.xcodeproj")
-    build_app(workspace: "Runner.xcworkspace", scheme: "Runner")
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+      }
+    )
+
     upload_to_testflight
   end
 
@@ -31,30 +37,52 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    match(type: "appstore", api_key: api_key)
+    is_ci = ENV["CI"] == "true"
+
+    match(
+      type: "appstore",
+      api_key: api_key,
+      readonly: is_ci, # CI: true | Local: false
+      keychain_name: "ci.keychain-db",
+      keychain_password: ENV["KEYCHAIN_PASSWORD"]
+    )
+
     increment_build_number(xcodeproj: "Runner.xcodeproj")
+
     build_app(
       workspace: "Runner.xcworkspace",
-      scheme: "Runner"
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+      }
     )
+
     upload_to_testflight(api_key: api_key)
   end
-  
+
   lane :local do
     api_key = app_store_connect_api_key(
       key_id: ENV["ASC_KEY_ID"],
       issuer_id: ENV["ASC_ISSUER_ID"],
-      key_filepath: "fastlane/AuthKey_CC5357V3QB.p8",
-      
+      key_filepath: "fastlane/AuthKey_CC5357V3QB.p8"
     )
 
+    # Local: normalmente NÃO readonly, para você poder "seedar" quando precisar
     match(type: "appstore")
+
     increment_build_number(xcodeproj: "Runner.xcodeproj")
-    build_app(workspace: "Runner.xcworkspace", scheme: "Runner", verbose: true)
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+      },
+      verbose: true
+    )
+
     upload_to_testflight(api_key: api_key)
   end
-  
-
-
 end
-
