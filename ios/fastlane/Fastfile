@@ -21,9 +21,6 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
-      export_options: {
-        provisioningProfiles: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
-      }
     )
 
     upload_to_testflight
@@ -37,14 +34,10 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    is_ci = ENV["CI"] == "true"
-
     match(
       type: "appstore",
       api_key: api_key,
-      readonly: is_ci, # CI: true | Local: false
-      #keychain_name: "ci.keychain-db",
-      keychain_password: ENV["KEYCHAIN_PASSWORD"]
+      readonly: true,
     )
 
     increment_build_number(xcodeproj: "Runner.xcodeproj")
@@ -52,10 +45,7 @@ platform :ios do
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
-      }
+      export_method: "app-store"
     )
 
     upload_to_testflight(api_key: api_key)
@@ -68,19 +58,14 @@ platform :ios do
       key_filepath: "fastlane/AuthKey_CC5357V3QB.p8"
     )
 
-    # Local: normalmente NÃO readonly, para você poder "seedar" quando precisar
-    match(type: "appstore")
+    match(type: "appstore", api_key: api_key)
 
     increment_build_number(xcodeproj: "Runner.xcodeproj")
 
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
-      },
-      verbose: true
+      export_method: "app-store"
     )
 
     upload_to_testflight(api_key: api_key)
