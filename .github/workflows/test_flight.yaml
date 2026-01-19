@@ -29,12 +29,17 @@ jobs:
 
       - name: Get Flutter dependencies
         run: flutter pub get
-
+        
+      - name: prebuild app
+      - run: flutter build ios --release --no-codesign --no-sound-null-safety
+      
       - name: Install gems (iOS)
         working-directory: ios
         run: bundle install
+        
 
 
+        
       - name: Run fastlane teste
         working-directory: ios
         env:
