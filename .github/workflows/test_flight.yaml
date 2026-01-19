@@ -34,22 +34,6 @@ jobs:
         working-directory: ios
         run: bundle install
 
-      - name: Create and unlock CI keychain
-        working-directory: ios
-        shell: bash
-        env:
-          KEYCHAIN_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        run: |
-          #set -euo pipefail
-          #KEYCHAIN_NAME=ci.keychain-db
-
-          #security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
-          #security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
-          #security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
-
-          # tornar o keychain pesquisável e default
-          #security list-keychains -d user -s "$KEYCHAIN_NAME" login.keychain-db
-          #security default-keychain -d user -s "$KEYCHAIN_NAME"
 
       - name: Run fastlane teste
         working-directory: ios

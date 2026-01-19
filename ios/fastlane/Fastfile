@@ -12,7 +12,8 @@ platform :ios do
       type: "appstore",
       readonly: is_ci,
       keychain_name: "ci.keychain-db",
-      keychain_password: ENV["KEYCHAIN_PASSWORD"]
+      keychain_password: ENV["KEYCHAIN_PASSWORD"],
+      verbose: true
     )
 
     increment_build_number(xcodeproj: "Runner.xcodeproj")
