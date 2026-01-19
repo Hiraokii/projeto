@@ -34,9 +34,7 @@ jobs:
         working-directory: ios
         run: bundle install
         
-      - name: Build ipa
-        run: flutter build ios --release --no-codesign 
-      
+
         
       - name: Run fastlane teste
         working-directory: ios
