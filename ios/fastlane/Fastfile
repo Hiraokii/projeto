@@ -43,7 +43,7 @@ platform :ios do
       type: "appstore",
       api_key: api_key,
       readonly: is_ci, # CI: true | Local: false
-      keychain_name: "ci.keychain-db",
+      #keychain_name: "ci.keychain-db",
       keychain_password: ENV["KEYCHAIN_PASSWORD"]
     )
 
